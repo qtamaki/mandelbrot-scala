@@ -47,8 +47,11 @@ case class Mandelbrot(width: Int, height: Int, lowerComplex: Complex, distanceRe
     probe(x,y)
   }
   def probe(x: Int, y: Int): Int = {
+    probe(x,y,9)
+  }
+  def probe(x: Int, y: Int, limit: Int): Int = {
     val c = pointToComp(x, y)
-    Mandelbrot.divergeTime(Complex.zero, c, 9)
+    Mandelbrot.divergeTime(Complex.zero, c, limit)
   }
 }
 
@@ -79,8 +82,7 @@ object Mandelbrot {
       y <- 0 until m.height
       x <- 0 until m.width
     } {
-      val c = pointToComp(m, x, y)
-      val r = divergeTime(z, c, 9)
+      val r = m.probe(x,y)
       if(x == m.width-1) println(r) else print (r)
     }
   }
