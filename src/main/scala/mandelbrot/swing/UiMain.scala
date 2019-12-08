@@ -1,5 +1,7 @@
 package mandelbrot.swing
 
+import java.awt.EventQueue
+
 import mandelbrot._
 
 import scala.swing._
@@ -16,8 +18,6 @@ object UiMain extends SimpleSwingApplication {
   val bluishGray = new AWTColor(200, 255, 255)
   val bluishSilver = new AWTColor(210, 255, 255)
   val data: Array[Int] = Array.fill(width*height)(0)
-
-  calc
 
   def onKeyPress(keyCode: Value) = keyCode match {
     case _ => // do something
@@ -40,6 +40,20 @@ object UiMain extends SimpleSwingApplication {
   }
 
   def mainPanel: Panel = new Panel {
+    def wandering(n: Int, w: Wander): Runnable = {
+      new Runnable(){
+        override def run(): Unit = {
+          if(n==0) return
+          calc(w.m)
+          repaint()
+          EventQueue.invokeLater(wandering(n-1, w.next))
+        }
+      }
+    }
+
+    val m = Mandelbrot(width, height, Complex(-2,-2), Complex(2,2))
+    EventQueue.invokeLater(wandering(1000, Wander(m, (0,0), 0.1)))
+
     preferredSize = new Dimension(width, height)
     focusable = true
     listenTo(keys)
@@ -55,8 +69,7 @@ object UiMain extends SimpleSwingApplication {
     }
   }
 
-  def calc = {
-    val m = Mandelbrot(width, height, Complex(-2,-2), Complex(2,2))
+  def calc(m: Mandelbrot) = {
     for {
       y <- 0 until height
       x <- 0 until width
