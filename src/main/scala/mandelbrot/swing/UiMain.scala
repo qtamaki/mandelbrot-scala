@@ -16,7 +16,7 @@ object UiMain extends SimpleSwingApplication {
   val height = 768
   val colorDepth = 255
   val bluishGray = new AWTColor(200, 255, 255)
-  val bluishSilver = new AWTColor(210, 255, 255)
+  val bluishRed = new AWTColor(255, 0, 0)
   val data: Array[Int] = Array.fill(width*height)(0)
 
   def onKeyPress(keyCode: Value) = keyCode match {
@@ -32,6 +32,8 @@ object UiMain extends SimpleSwingApplication {
       g.setColor(b)
       g.drawLine(x,y,x,y)
     }
+    g.setColor(bluishRed)
+    g.drawLine(width/2,height/2,width/2,height/2)
   }
 
   def top: MainFrame = new MainFrame {
@@ -52,7 +54,7 @@ object UiMain extends SimpleSwingApplication {
     }
 
     val m = Mandelbrot(width, height, Complex(-2,-2), Complex(2,2))
-    EventQueue.invokeLater(wandering(1000, Wander(m, (0,0), 0.1)))
+    EventQueue.invokeLater(wandering(1000, Wander(m, (0,0), 1.0/30)))
 
     preferredSize = new Dimension(width, height)
     focusable = true
