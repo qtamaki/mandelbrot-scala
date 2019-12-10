@@ -63,7 +63,7 @@ object Mandelbrot {
   @tailrec
   def divergeTime(z: Complex, c: Complex, limit: Int): Int = {
     val z_ = z * z + c
-    if (!z_ > 4.0 || limit == 0) limit else divergeTime(z_, c, limit - 1)
+    if (z_.normSqr > 4.0 || limit == 0) limit else divergeTime(z_, c, limit - 1)
   }
 
   def pointToComp(m: Mandelbrot, x: Int, y: Int): Complex = {
