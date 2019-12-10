@@ -5,13 +5,13 @@ import java.util.concurrent.Executors
 
 import mandelbrot._
 
+import scala.collection.mutable.Queue
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutorService, Future}
 import scala.swing._
 
 object UiMain extends SimpleSwingApplication {
   import event._
-  import event.Key._
   import java.awt.{Dimension, Graphics2D, Graphics, Image, Rectangle}
   import java.awt.{Color => AWTColor}
 
@@ -23,12 +23,10 @@ object UiMain extends SimpleSwingApplication {
   val bluishGray = new AWTColor(200, 255, 255)
   val bluishRed = new AWTColor(255, 0, 0)
   val data: Array[Int] = Array.fill(width*height)(0)
+  val queue: Queue[Point] = new scala.collection.mutable.Queue[Point]
 
   val start = System.currentTimeMillis
 
-  def onKeyPress(keyCode: Value) = keyCode match {
-    case _ => // do something
-  }
   def onPaint(g: Graphics2D) {
     for {
       y <- 0 until height
@@ -56,9 +54,14 @@ object UiMain extends SimpleSwingApplication {
             println("Time： " + ((System.currentTimeMillis - start)/1000) + " sec")
             return
           }
-          calc_p2(w.m)
+          val w_ = if(!queue.isEmpty) {
+            val p = queue.dequeue()
+            w.copy(m = w.m.move(p.x, p.y))
+          } else w
+          calc_p2(w_.m)
           repaint()
-          EventQueue.invokeLater(wandering(n-1, w.next))
+//          EventQueue.invokeLater(wandering(n-1, w_.next))
+            EventQueue.invokeLater(wandering(n-1, w_.next_zoom))
         }
       }
     }
@@ -68,11 +71,11 @@ object UiMain extends SimpleSwingApplication {
 
     preferredSize = new Dimension(width, height)
     focusable = true
-    listenTo(keys)
+    listenTo(mouse.clicks)
     reactions += {
-      case KeyPressed(_, key, _, _) =>
-        onKeyPress(key)
-        repaint
+      case MouseClicked(_, point, _, _, _) =>
+        println(s"mouse: $point")
+        queue += point
     }
     override def paint(g: Graphics2D) {
       g setColor bluishGray

@@ -61,6 +61,12 @@ case class Wander(m: Mandelbrot, direction: (Int, Int), velocity: Double) {
     ds.minBy{case (x, (a,b)) => x}
   }
 
+  // zoopだけ
+  def next_zoom: Wander = {
+    println(s"zoom")
+    Wander(m = m.zoom(1-velocity), direction, velocity)
+  }
+
   def next: Wander = {
     val (len, d) = detect
     print(s"len: $len, ")
